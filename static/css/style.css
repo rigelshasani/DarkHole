@@ -67,7 +67,7 @@ h1 {
     color: #a0a0a0;
 }
 
-/* Black Hole Animation */
+/* Ouroboros Animation */
 .black-hole-container {
     display: flex;
     justify-content: center;
@@ -82,19 +82,7 @@ h1 {
     height: 150px;
 }
 
-.event-horizon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100px;
-    height: 100px;
-    background: #000;
-    border-radius: 50%;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-}
-
-.accretion-disk {
+.ouroboros {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -102,15 +90,48 @@ h1 {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     border-top-color: #ff3366;
     border-right-color: #ff3366;
+    border-bottom-color: #ff3366;
     animation: rotate 4s linear infinite;
+}
+
+.ouroboros::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    background: #ff3366;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff3366;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.ouroboros::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 51, 102, 0.2);
+    animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes rotate {
     from { transform: translate(-50%, -50%) rotate(0deg); }
     to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 /* Upload Container */
@@ -242,12 +263,7 @@ footer {
         height: 120px;
     }
 
-    .event-horizon {
-        width: 80px;
-        height: 80px;
-    }
-
-    .accretion-disk {
+    .ouroboros {
         width: 120px;
         height: 120px;
     }
