@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Text Extractor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF Text Extractor</h1>
+            <p>Upload your PDF document and get the extracted text in seconds</p>
+        </header>
+
+        <main>
+            <div class="upload-container" id="uploadContainer">
+                <div class="upload-area" id="dropZone">
+                    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon" class="upload-icon">
+                    <h2>Drag & Drop your PDF here</h2>
+                    <p>or</p>
+                    <label for="fileInput" class="upload-button">Choose File</label>
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                </div>
+            </div>
+
+            <div class="progress-container" id="progressContainer" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <p id="statusText">Processing your PDF...</p>
+            </div>
+
+            <div class="result-container" id="resultContainer" style="display: none;">
+                <div class="success-message">
+                    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success" class="success-icon">
+                    <h2>Text Extraction Complete!</h2>
+                    <p>Your text has been successfully extracted from the PDF.</p>
+                    <a href="#" id="downloadButton" class="download-button">Download Text File</a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Free PDF Text Extractor - No registration required</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
