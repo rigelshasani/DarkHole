@@ -245,7 +245,72 @@ footer {
     font-size: 0.9rem;
 }
 
-/* Responsive Design */
+/* Features Section */
+.features-section {
+    margin: 4rem 0;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.features-section h3 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #ff3366;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    background: rgba(255, 51, 102, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h4 {
+    color: #ff3366;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.feature-card p {
+    color: #fff;
+    line-height: 1.6;
+}
+
+.learn-more-btn {
+    display: inline-block;
+    background: linear-gradient(45deg, #ff3366, #ff6b6b);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 2rem;
+}
+
+.learn-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -263,5 +328,128 @@ footer {
     .ouroboros {
         width: 120px;
         height: 120px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Features Page Styles */
+.features-content {
+    margin: 4rem 0;
+}
+
+.tech-section {
+    margin-bottom: 4rem;
+}
+
+.tech-section h2 {
+    color: #ff3366;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.tech-card {
+    background: rgba(255, 51, 102, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.tech-card:hover {
+    transform: translateY(-5px);
+}
+
+.tech-card h3 {
+    color: #ff3366;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.tech-card p {
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.tech-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.tech-card ul li {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.tech-card ul li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #ff3366;
+}
+
+.cta-section {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 4rem 0;
+}
+
+.back-btn, .try-now-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.back-btn {
+    background: rgba(255, 51, 102, 0.1);
+    color: #ff3366;
+    border: 2px solid #ff3366;
+}
+
+.try-now-btn {
+    background: linear-gradient(45deg, #ff3366, #ff6b6b);
+    color: white;
+}
+
+.back-btn:hover, .try-now-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+}
+
+@media (max-width: 768px) {
+    .tech-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .back-btn, .try-now-btn {
+        width: 100%;
+        text-align: center;
     }
 } 

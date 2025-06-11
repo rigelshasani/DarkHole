@@ -30,28 +30,50 @@
             </div>
 
             <div class="upload-container">
+                <h2>Extract Text from PDFs</h2>
+                <p>Upload your PDF and get the text content instantly</p>
                 <div class="upload-area" id="dropZone">
-                    <div class="upload-content">
-                        <div class="upload-icon">📄</div>
-                        <p>Drag & drop your PDF here</p>
-                        <p class="or">or</p>
-                        <label for="fileInput" class="upload-button">Choose File</label>
-                        <input type="file" id="fileInput" accept=".pdf" hidden>
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                    <div class="upload-icon">📄</div>
+                    <p>Drag & Drop your PDF here</p>
+                    <p>or</p>
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                </div>
+            </div>
+
+            <div class="features-section">
+                <h3>Why Choose DarkHole?</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h4>Lightning Fast</h4>
+                        <p>Process your PDFs in seconds with our optimized extraction engine</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h4>Secure & Private</h4>
+                        <p>Your files are processed locally and never stored on our servers</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h4>High Accuracy</h4>
+                        <p>Advanced OCR technology for precise text extraction</p>
                     </div>
                 </div>
+                <a href="/features" class="learn-more-btn">Learn More About Our Technology</a>
+            </div>
 
-                <div class="progress-container" style="display: none;">
-                    <div class="progress-bar">
-                        <div class="progress"></div>
-                    </div>
-                    <p class="progress-text">Processing your PDF...</p>
+            <div class="progress-container" id="progressContainer" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress"></div>
                 </div>
+                <p class="progress-text">Processing your PDF...</p>
+            </div>
 
-                <div class="result-container" style="display: none;">
-                    <div class="success-message">
-                        <p>✨ Text extracted successfully!</p>
-                        <a href="#" class="download-button" id="downloadLink">Download Text File</a>
-                    </div>
+            <div class="result-container" style="display: none;">
+                <div class="success-message">
+                    <p>✨ Text extracted successfully!</p>
+                    <a href="#" class="download-button" id="downloadLink">Download Text File</a>
                 </div>
             </div>
         </main>
