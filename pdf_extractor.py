@@ -7,6 +7,13 @@ import re
 from pathlib import Path
 import logging
 import time
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfpage import PDFPage
+from pdfminer.converter import TextConverter
+from pdfminer.pdfinterp import PDFPageInterpreter
+import io
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -32,26 +39,46 @@ class PDFExtractor:
     
     def extract_with_pdfminer(self):
         """Extract text using PDFMiner."""
-        logger.info("Extracting text with PDFMiner...")
-        text_by_page = []
-        for page_layout in extract_pages(self.pdf_path):
-            page_text = ""
-            for element in page_layout:
-                if isinstance(element, LTTextContainer):
-                    page_text += element.get_text()
-            text_by_page.append(self.clean_text(page_text))
-        return text_by_page
+        try:
+            logger.info("Extracting text with PDFMiner...")
+            text_pages = []
+            with open(self.pdf_path, 'rb') as file:
+                parser = PDFParser(file)
+                document = PDFDocument(parser)
+                if not document.is_extractable:
+                    return []
+                
+                rsrcmgr = PDFResourceManager()
+                laparams = LAParams()
+                device = TextConverter(rsrcmgr, io.StringIO(), laparams=laparams)
+                interpreter = PDFPageInterpreter(rsrcmgr, device)
+                
+                for page in PDFPage.create_pages(document):
+                    interpreter.process_page(page)
+                    text = device.get_text()
+                    if text.strip():
+                        text_pages.append(text.strip())
+                    device.reset()
+            
+            return text_pages
+        except Exception as e:
+            logger.error(f"PDFMiner extraction failed: {str(e)}")
+            return []
     
     def extract_with_pymupdf(self):
         """Extract text using PyMuPDF."""
-        logger.info("Extracting text with PyMuPDF...")
-        text_by_page = []
-        doc = fitz.open(self.pdf_path)
-        for page in doc:
-            text = page.get_text("text")
-            text_by_page.append(self.clean_text(text))
-        doc.close()
-        return text_by_page
+        try:
+            logger.info("Extracting text with PyMuPDF...")
+            text_pages = []
+            doc = fitz.open(self.pdf_path)
+            for page in doc:
+                text = page.get_text()
+                if text.strip():
+                    text_pages.append(text.strip())
+            return text_pages
+        except Exception as e:
+            logger.error(f"PyMuPDF extraction failed: {str(e)}")
+            return []
     
     def extract_with_ocr(self):
         """Extract text using OCR."""
@@ -106,12 +133,14 @@ class PDFExtractor:
             timeout = 30  # 30 seconds timeout
             
             # Try PDFMiner first (fastest)
-            pdfminer_text = self.extract_with_pdfminer()
+            pdfminer_texts = self.extract_with_pdfminer()
+            pdfminer_text = "\n".join(pdfminer_texts) if pdfminer_texts else ""
             if pdfminer_text and len(pdfminer_text.strip()) > 100:
                 return pdfminer_text
                 
             # Try PyMuPDF next
-            pymupdf_text = self.extract_with_pymupdf()
+            pymupdf_texts = self.extract_with_pymupdf()
+            pymupdf_text = "\n".join(pymupdf_texts) if pymupdf_texts else ""
             if pymupdf_text and len(pymupdf_text.strip()) > 100:
                 return pymupdf_text
                 
