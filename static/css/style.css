@@ -90,10 +90,7 @@ h1 {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: #ff3366;
-    border-right-color: #ff3366;
-    border-bottom-color: #ff3366;
+    border: 3px solid #ff3366;
     animation: rotate 4s linear infinite;
 }
 
