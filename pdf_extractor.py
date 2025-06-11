@@ -6,6 +6,7 @@ import pytesseract
 import re
 from pathlib import Path
 import logging
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -53,14 +54,29 @@ class PDFExtractor:
         return text_by_page
     
     def extract_with_ocr(self):
-        """Extract text using Tesseract OCR."""
-        logger.info("Extracting text with OCR...")
-        text_by_page = []
-        images = convert_from_path(self.pdf_path, dpi=self.dpi)
-        for img in images:
-            text = pytesseract.image_to_string(img, lang='eng', config='--psm 4')
-            text_by_page.append(self.clean_text(text))
-        return text_by_page
+        """Extract text using OCR."""
+        try:
+            # Convert PDF to images with lower DPI to reduce memory usage
+            images = convert_from_path(
+                self.pdf_path,
+                dpi=150,  # Reduced from 300 to 150
+                thread_count=1,  # Single thread to reduce memory usage
+                fmt='jpeg',  # Use JPEG instead of PNG
+                grayscale=True  # Use grayscale to reduce memory
+            )
+            
+            texts = []
+            for img in images:
+                # Process one page at a time
+                text = pytesseract.image_to_string(img)
+                texts.append(text)
+                # Clear memory
+                del img
+                
+            return texts
+        except Exception as e:
+            logger.error(f"OCR extraction failed: {str(e)}")
+            return []
     
     def merge_texts(self, pdfminer_texts, pymupdf_texts, ocr_texts):
         """Merge texts from different methods, preferring the longest valid text for each page."""
@@ -83,27 +99,34 @@ class PDFExtractor:
         return merged_texts
     
     def extract(self):
-        """Main extraction method that combines all approaches."""
+        """Extract text using all available methods and combine results."""
         try:
-            # Extract using all methods
-            pdfminer_texts = self.extract_with_pdfminer()
-            pymupdf_texts = self.extract_with_pymupdf()
-            ocr_texts = self.extract_with_ocr()
+            # Set a timeout for the entire extraction process
+            start_time = time.time()
+            timeout = 30  # 30 seconds timeout
             
-            # Merge the results
-            merged_texts = self.merge_texts(pdfminer_texts, pymupdf_texts, ocr_texts)
+            # Try PDFMiner first (fastest)
+            pdfminer_text = self.extract_with_pdfminer()
+            if pdfminer_text and len(pdfminer_text.strip()) > 100:
+                return pdfminer_text
+                
+            # Try PyMuPDF next
+            pymupdf_text = self.extract_with_pymupdf()
+            if pymupdf_text and len(pymupdf_text.strip()) > 100:
+                return pymupdf_text
+                
+            # Only try OCR if other methods failed and we haven't timed out
+            if time.time() - start_time < timeout:
+                ocr_texts = self.extract_with_ocr()
+                if ocr_texts:
+                    return "\n".join(ocr_texts)
             
-            # Format the output
-            output = []
-            for i, text in enumerate(merged_texts, 1):
-                if text:  # Only include non-empty pages
-                    output.append(f"\n{'='*50}\nPage {i}\n{'='*50}\n\n{text}\n")
-            
-            return "\n".join(output)
+            # If all methods failed or timed out, return the best result
+            return pdfminer_text or pymupdf_text or "Text extraction failed. Please try a different PDF."
             
         except Exception as e:
-            logger.error(f"Error during extraction: {str(e)}")
-            raise
+            logger.error(f"Text extraction failed: {str(e)}")
+            return "An error occurred during text extraction. Please try again."
 
 def main():
     pdf_path = "responsiveRecord.pdf"
