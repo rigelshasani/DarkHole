@@ -1,19 +1,18 @@
-import fitz  # PyMuPDF
-from pdfminer.high_level import extract_pages
-from pdfminer.layout import LTTextContainer
-from pdf2image import convert_from_path
-import pytesseract
-import re
-from pathlib import Path
+import os
 import logging
 import time
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
-from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.layout import LAParams
 import io
+import fitz  # PyMuPDF
+from pdf2image import convert_from_path
+import pytesseract
+from PIL import Image
+import tempfile
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
