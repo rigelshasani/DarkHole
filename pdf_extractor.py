@@ -49,15 +49,17 @@ class PDFExtractor:
                 
                 rsrcmgr = PDFResourceManager()
                 laparams = LAParams()
-                device = TextConverter(rsrcmgr, io.StringIO(), laparams=laparams)
-                interpreter = PDFPageInterpreter(rsrcmgr, device)
                 
                 for page in PDFPage.create_pages(document):
+                    output_string = io.StringIO()
+                    device = TextConverter(rsrcmgr, output_string, laparams=laparams)
+                    interpreter = PDFPageInterpreter(rsrcmgr, device)
                     interpreter.process_page(page)
-                    text = device.get_text()
+                    text = output_string.getvalue()
                     if text.strip():
                         text_pages.append(text.strip())
-                    device.reset()
+                    device.close()
+                    output_string.close()
             
             return text_pages
         except Exception as e:

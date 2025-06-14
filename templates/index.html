@@ -30,14 +30,26 @@
             </div>
 
             <div class="upload-container">
-                <h2>Extract Text from PDFs</h2>
-                <p>Upload your PDF and get the text content instantly</p>
+                <div class="black-hole-container">
+                    <div class="event-horizon"></div>
+                    <div class="accretion-disk"></div>
+                </div>
+                
+                <div class="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                    <p class="progress-text">Processing your PDF...</p>
+                </div>
+
                 <div class="upload-area" id="dropZone">
-                    <input type="file" id="fileInput" accept=".pdf" hidden>
-                    <div class="upload-icon">📄</div>
-                    <p>Drag & Drop your PDF here</p>
-                    <p>or</p>
-                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                    <div class="upload-content">
+                        <i class="fas fa-file-pdf"></i>
+                        <h2>Drop your PDF here</h2>
+                        <p>or</p>
+                        <label for="fileInput" class="upload-button">Choose File</label>
+                        <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+                    </div>
                 </div>
             </div>
 
@@ -61,13 +73,6 @@
                     </div>
                 </div>
                 <a href="/features" class="learn-more-btn">Learn More About Our Technology</a>
-            </div>
-
-            <div class="progress-container" id="progressContainer" style="display: none;">
-                <div class="progress-bar">
-                    <div class="progress"></div>
-                </div>
-                <p class="progress-text">Processing your PDF...</p>
             </div>
 
             <div class="result-container" style="display: none;">
