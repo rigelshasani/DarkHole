@@ -1,5 +1,6 @@
 import os
 import logging
+import sys
 import time
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
@@ -13,13 +14,27 @@ from pdf2image import convert_from_path
 import pytesseract
 from PIL import Image
 import tempfile
+import re
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging to output to stdout/stderr
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.StreamHandler(sys.stderr)
+    ]
+)
 logger = logging.getLogger(__name__)
 
+def extract_text_from_pdf(pdf_path):
+    """Extract text from PDF using multiple methods."""
+    logger.info(f"Starting text extraction for: {pdf_path}")
+    extractor = PDFExtractor(pdf_path)
+    return extractor.extract()
+
 class PDFExtractor:
-    def __init__(self, pdf_path, dpi=300, min_text_length=50):
+    def __init__(self, pdf_path, dpi=150, min_text_length=50):
         self.pdf_path = pdf_path
         self.dpi = dpi
         self.min_text_length = min_text_length
@@ -45,6 +60,7 @@ class PDFExtractor:
                 parser = PDFParser(file)
                 document = PDFDocument(parser)
                 if not document.is_extractable:
+                    logger.warning("PDF is not extractable with PDFMiner")
                     return []
                 
                 rsrcmgr = PDFResourceManager()
@@ -61,9 +77,11 @@ class PDFExtractor:
                     device.close()
                     output_string.close()
             
+            logger.info(f"PDFMiner extracted {len(text_pages)} pages")
             return text_pages
         except Exception as e:
             logger.error(f"PDFMiner extraction failed: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return []
     
     def extract_with_pymupdf(self):
@@ -76,34 +94,44 @@ class PDFExtractor:
                 text = page.get_text()
                 if text.strip():
                     text_pages.append(text.strip())
+            logger.info(f"PyMuPDF extracted {len(text_pages)} pages")
             return text_pages
         except Exception as e:
             logger.error(f"PyMuPDF extraction failed: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return []
     
     def extract_with_ocr(self):
         """Extract text using OCR."""
         try:
-            # Convert PDF to images with lower DPI to reduce memory usage
+            logger.info("Extracting text with OCR...")
+            text_pages = []
             images = convert_from_path(
                 self.pdf_path,
-                dpi=150,  # Reduced from 300 to 150
-                thread_count=1,  # Single thread to reduce memory usage
-                fmt='jpeg',  # Use JPEG instead of PNG
-                grayscale=True  # Use grayscale to reduce memory
+                dpi=self.dpi,
+                thread_count=1,
+                fmt='jpeg'
             )
             
-            texts = []
-            for img in images:
-                # Process one page at a time
-                text = pytesseract.image_to_string(img)
-                texts.append(text)
-                # Clear memory
-                del img
-                
-            return texts
+            for i, image in enumerate(images):
+                logger.info(f"Processing page {i+1} with OCR")
+                # Convert to grayscale
+                image = image.convert('L')
+                # Save to temporary file
+                with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
+                    image.save(temp_file.name, 'JPEG')
+                    # Perform OCR
+                    text = pytesseract.image_to_string(temp_file.name)
+                    if text.strip():
+                        text_pages.append(text.strip())
+                    # Clean up
+                    os.unlink(temp_file.name)
+            
+            logger.info(f"OCR extracted {len(text_pages)} pages")
+            return text_pages
         except Exception as e:
             logger.error(f"OCR extraction failed: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return []
     
     def merge_texts(self, pdfminer_texts, pymupdf_texts, ocr_texts):
@@ -137,25 +165,30 @@ class PDFExtractor:
             pdfminer_texts = self.extract_with_pdfminer()
             pdfminer_text = "\n".join(pdfminer_texts) if pdfminer_texts else ""
             if pdfminer_text and len(pdfminer_text.strip()) > 100:
+                logger.info("Using PDFMiner results")
                 return pdfminer_text
                 
             # Try PyMuPDF next
             pymupdf_texts = self.extract_with_pymupdf()
             pymupdf_text = "\n".join(pymupdf_texts) if pymupdf_texts else ""
             if pymupdf_text and len(pymupdf_text.strip()) > 100:
+                logger.info("Using PyMuPDF results")
                 return pymupdf_text
                 
             # Only try OCR if other methods failed and we haven't timed out
             if time.time() - start_time < timeout:
                 ocr_texts = self.extract_with_ocr()
                 if ocr_texts:
+                    logger.info("Using OCR results")
                     return "\n".join(ocr_texts)
             
             # If all methods failed or timed out, return the best result
+            logger.warning("All extraction methods failed or timed out")
             return pdfminer_text or pymupdf_text or "Text extraction failed. Please try a different PDF."
             
         except Exception as e:
             logger.error(f"Text extraction failed: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return "An error occurred during text extraction. Please try again."
 
 def main():
@@ -174,10 +207,6 @@ def main():
         
     except Exception as e:
         logger.error(f"Failed to process PDF: {str(e)}")
-
-def extract_text_from_pdf(filepath):
-    extractor = PDFExtractor(filepath)
-    return extractor.extract()
 
 if __name__ == "__main__":
     main() 
