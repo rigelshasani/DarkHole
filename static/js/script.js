@@ -95,7 +95,12 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             clearInterval(interval);
             progressBar.style.width = '100%';
@@ -111,7 +116,15 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 progressContainer.style.display = 'none';
                 resultContainer.style.display = 'block';
-                downloadLink.href = data.download_url;
+                
+                // Set the download link
+                if (data.download_url) {
+                    downloadLink.href = data.download_url;
+                    downloadLink.style.display = 'inline-block';
+                } else {
+                    console.error('No download URL in response:', data);
+                    downloadLink.style.display = 'none';
+                }
             }, 500);
         })
         .catch(error => {
@@ -126,6 +139,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Add error handling for download link
+    downloadLink.addEventListener('click', function(e) {
+        if (!this.href || this.href === 'undefined') {
+            e.preventDefault();
+            console.error('Invalid download URL');
+            alert('Download link is not available. Please try processing the file again.');
+        }
+    });
 
     // Add parallax effect to stars
     document.addEventListener('mousemove', function(e) {
