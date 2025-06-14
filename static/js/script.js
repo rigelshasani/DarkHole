@@ -56,8 +56,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (files.length > 0) {
             const file = files[0];
             if (file.type === 'application/pdf') {
+                // Track file upload attempt
+                gtag('event', 'pdf_upload_attempt', {
+                    'file_size': file.size,
+                    'file_name': file.name
+                });
                 uploadFile(file);
             } else {
+                // Track invalid file type
+                gtag('event', 'invalid_file_type', {
+                    'file_type': file.type
+                });
                 alert('Please upload a PDF file.');
             }
         }
@@ -92,6 +101,12 @@ document.addEventListener('DOMContentLoaded', function() {
             progressBar.style.width = '100%';
             progressText.textContent = 'Processing complete!';
 
+            // Track successful processing
+            gtag('event', 'pdf_processing_success', {
+                'file_size': file.size,
+                'file_name': file.name
+            });
+
             // Show result container
             setTimeout(() => {
                 progressContainer.style.display = 'none';
@@ -102,6 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             progressText.textContent = 'Error processing file. Please try again.';
+            
+            // Track processing error
+            gtag('event', 'pdf_processing_error', {
+                'file_size': file.size,
+                'file_name': file.name,
+                'error': error.message
+            });
         });
     }
 
