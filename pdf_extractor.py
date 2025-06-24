@@ -15,6 +15,7 @@ import pytesseract
 from PIL import Image
 import tempfile
 import re
+import traceback
 
 # Configure logging to output to stdout/stderr
 logging.basicConfig(
