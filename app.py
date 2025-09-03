@@ -38,6 +38,30 @@ def allowed_file(filename):
         '.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def validate_file_path(filepath, base_dir):
+    """Validate that file path is within base directory to prevent path traversal."""
+    try:
+        real_filepath = os.path.realpath(filepath)
+        real_base_dir = os.path.realpath(base_dir)
+        return real_filepath.startswith(real_base_dir + os.sep)
+    except (OSError, ValueError):
+        return False
+
+
+def get_session_id():
+    """Get or create a unique session ID."""
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid.uuid4())
+    return session['session_id']
+
+
+def sanitize_error(error_msg):
+    """Return sanitized error message for user."""
+    # Log the full error server-side but return generic message to user
+    logger.error(f'Internal error: {error_msg}')
+    return 'An error occurred while processing your request. Please try again.'
+
+
 @app.before_request
 def log_request_info():
     app.logger.info('%s %s', request.method, request.path)
@@ -95,32 +119,38 @@ def upload_file():
             app.logger.error('Invalid PDF header')
             return jsonify({'error': 'File does not appear to be a valid PDF'}), 400
 
-        # Create temp directory if it doesn't exist
-        temp_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'darkhole_temp')
+        # Create session-specific temp directory
+        session_id = get_session_id()
+        temp_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'darkhole_temp', session_id)
         os.makedirs(temp_dir, exist_ok=True)
-
-        # Save uploaded file
-        filename = secure_filename(file.filename)
+        
+        # Generate unique filename with timestamp
+        timestamp = int(time.time() * 1000)
+        base_filename = secure_filename(file.filename)
+        filename = f'{timestamp}_{base_filename}'
         filepath = os.path.join(temp_dir, filename)
+        
+        # Validate file path to prevent directory traversal
+        if not validate_file_path(filepath, temp_dir):
+            app.logger.error('Invalid file path detected')
+            return jsonify({'error': 'Invalid file path'}), 400
+            
         file.save(filepath)
-        app.logger.info('File saved to: %s', filepath)
+        app.logger.info('File saved to session directory')
 
         # Extract text
         try:
             text = extract_text_from_pdf(filepath)
             app.logger.info('Text extraction successful')
 
-            # Save extracted text
-            output_path = os.path.join(temp_dir, 'extracted_text.txt')
-            if os.path.exists(output_path):
-                os.remove(output_path)
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(text)
-            app.logger.info('Extracted text saved to: %s', output_path)
+            # Store extracted text in session instead of file
+            session['extracted_text'] = text
+            app.logger.info('Extracted text stored in session')
 
             return jsonify({
                 'message': 'File processed successfully',
-                'download_url': '/download'
+                'text': text,
+                'success': True
             })
         except Exception as e:
             app.logger.error('Text extraction failed: %s', str(e))
@@ -144,56 +174,20 @@ def download_file():
     try:
         app.logger.info('Download request received')
         
-        # Get session info
-        session_id = session.get('session_id')
-        output_filename = session.get('output_filename')
+        # Get extracted text from session
+        extracted_text = session.get('extracted_text')
         
-        if not session_id or not output_filename:
-            app.logger.error('No file available for download in session')
-            return jsonify({'error': 'No file available for download'}), 404
+        if not extracted_text:
+            app.logger.error('No text available for download in session')
+            return jsonify({'error': 'No text available for download'}), 404
             
-        output_path = os.path.join(
-            app.config['UPLOAD_FOLDER'],
-            'darkhole_temp',
-            session_id,
-            output_filename
+        app.logger.info('Sending text file for download')
+        return send_file(
+            io.BytesIO(extracted_text.encode('utf-8')),
+            as_attachment=True,
+            download_name='extracted_text.txt',
+            mimetype='text/plain'
         )
-        
-        # Validate file path
-        session_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'darkhole_temp', session_id)
-        if not validate_file_path(output_path, session_dir):
-            app.logger.error('Invalid download path detected')
-            return jsonify({'error': 'Invalid file path'}), 400
-            
-        if os.path.exists(output_path):
-            app.logger.info('Sending file for download')
-            with open(output_path, 'rb') as f:
-                data = f.read()
-            
-            # Clean up file after reading
-            try:
-                os.remove(output_path)
-                # Clean up session data and try to remove session directory if empty
-                session.pop('output_filename', None)
-                try:
-                    session_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'darkhole_temp', session_id)
-                    if os.path.exists(session_dir) and not os.listdir(session_dir):
-                        os.rmdir(session_dir)
-                        app.logger.info('Empty session directory cleaned up')
-                except Exception as dir_cleanup_error:
-                    app.logger.warning('Failed to cleanup session directory: %s', str(dir_cleanup_error))
-            except Exception as cleanup_error:
-                app.logger.error('Failed to cleanup file: %s', str(cleanup_error))
-                
-            return send_file(
-                io.BytesIO(data),
-                as_attachment=True,
-                download_name='extracted_text.txt',
-                mimetype='text/plain'
-            )
-        
-        app.logger.error('File not found for download')
-        return jsonify({'error': 'File not found'}), 404
         
     except Exception as e:
         app.logger.error('Download failed: %s', str(e))

@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressText = document.querySelector('.progress-text');
     const resultContainer = document.querySelector('.result-container');
     const downloadLink = document.getElementById('downloadLink');
+    const extractedTextArea = document.getElementById('extractedText');
+    const copyButton = document.getElementById('copyButton');
 
     // Prevent default drag behaviors
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -112,17 +114,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 'file_name': file.name
             });
 
-            // Show result container
+            // Show result container with extracted text
             setTimeout(() => {
                 progressContainer.style.display = 'none';
                 resultContainer.style.display = 'block';
                 
-                // Set the download link
-                if (data.download_url) {
-                    downloadLink.href = data.download_url;
+                // Display extracted text in textarea
+                if (data.text) {
+                    extractedTextArea.value = data.text;
+                    downloadLink.href = '/download';
                     downloadLink.style.display = 'inline-block';
                 } else {
-                    console.error('No download URL in response:', data);
+                    console.error('No text in response:', data);
+                    extractedTextArea.value = 'Error: No text extracted from PDF';
                     downloadLink.style.display = 'none';
                 }
             }, 500);
@@ -140,12 +144,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Add copy to clipboard functionality
+    copyButton.addEventListener('click', function() {
+        if (extractedTextArea.value) {
+            navigator.clipboard.writeText(extractedTextArea.value).then(() => {
+                // Visual feedback for successful copy
+                const originalText = copyButton.textContent;
+                copyButton.textContent = '✓ Copied!';
+                copyButton.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                    copyButton.classList.remove('copied');
+                }, 2000);
+                
+                // Track copy action
+                gtag('event', 'text_copied', {
+                    'text_length': extractedTextArea.value.length
+                });
+            }).catch(err => {
+                console.error('Failed to copy text:', err);
+                // Fallback for older browsers
+                extractedTextArea.select();
+                document.execCommand('copy');
+                copyButton.textContent = '✓ Copied!';
+                copyButton.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyButton.textContent = '📋 Copy Text';
+                    copyButton.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    });
+
     // Add error handling for download link
     downloadLink.addEventListener('click', function(e) {
-        if (!this.href || this.href === 'undefined') {
+        if (!extractedTextArea.value) {
             e.preventDefault();
-            console.error('Invalid download URL');
-            alert('Download link is not available. Please try processing the file again.');
+            console.error('No text available for download');
+            alert('No text available for download. Please process a PDF first.');
         }
     });
 

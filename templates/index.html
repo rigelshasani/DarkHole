@@ -64,13 +64,23 @@
                 </div>
             </div>
 
-            <!-- Success/Download Section - Shows prominently when ready -->
+            <!-- Success/Text Preview Section - Shows prominently when ready -->
             <div class="result-container" style="display: none;">
                 <div class="success-message">
                     <div class="success-icon">🎉</div>
                     <h3>Text Extracted Successfully!</h3>
-                    <p>Your PDF has been processed and the text is ready for download</p>
-                    <a href="#" class="download-button" id="downloadLink">📄 Download Text File</a>
+                    <p>Your PDF has been processed and the text is ready below</p>
+                    
+                    <div class="text-preview-container">
+                        <div class="text-preview-header">
+                            <span>Extracted Text</span>
+                            <div class="text-controls">
+                                <button class="copy-button" id="copyButton">📋 Copy Text</button>
+                                <a href="#" class="download-button" id="downloadLink">📄 Download File</a>
+                            </div>
+                        </div>
+                        <textarea class="text-preview" id="extractedText" readonly></textarea>
+                    </div>
                 </div>
             </div>
 
