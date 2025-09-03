@@ -2,13 +2,7 @@
 
 A secure, high-performance PDF text extraction tool with a cosmic-inspired interface.
 
----
-
-## 🚀 **Try DarkHole Live**
-
 ### **[Visit darkhole.org →](https://darkhole.org)**
-
-*Extract text from any PDF with cosmic precision - no installation required!*
 
 ---
 
@@ -82,5 +76,3 @@ Visit `http://localhost:5000` to start extracting text from your PDFs.
 Fully responsive design optimized for mobile devices with touch-friendly interactions and performance optimizations.
 
 ---
-
-*Extract text from any PDF with cosmic precision* (
