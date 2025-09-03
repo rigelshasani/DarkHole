@@ -39,15 +39,13 @@
             <div class="black-hole-container">
                 <div class="black-hole">
                     <div class="ouroboros"></div>
+                    <div class="planet planet-1"></div>
+                    <div class="planet planet-2"></div>
+                    <div class="planet planet-3"></div>
                 </div>
             </div>
 
             <div class="upload-container">
-                <div class="black-hole-container">
-                    <div class="event-horizon"></div>
-                    <div class="accretion-disk"></div>
-                </div>
-                
                 <div class="progress-container" style="display: none;">
                     <div class="progress-bar">
                         <div class="progress"></div>
@@ -57,9 +55,9 @@
 
                 <div class="upload-area" id="dropZone">
                     <div class="upload-content">
-                        <i class="fas fa-file-pdf"></i>
+                        <div class="upload-icon">📄</div>
                         <h2>Drop your PDF here</h2>
-                        <p>or</p>
+                        <p class="or">or</p>
                         <label for="fileInput" class="upload-button">Choose File</label>
                         <input type="file" id="fileInput" accept=".pdf" style="display: none;">
                     </div>
