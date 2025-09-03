@@ -293,32 +293,86 @@ h1 {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-/* Result Container */
+/* Result Container - Prominent Success Message */
 .result-container {
-    margin-top: 2rem;
+    margin: 2rem auto;
     text-align: center;
+    max-width: 600px;
 }
 
 .success-message {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.1));
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+    backdrop-filter: blur(10px);
+    animation: successFadeIn 0.8s ease-out;
+}
+
+.success-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: bounce 1s ease-in-out;
+}
+
+.success-message h3 {
     color: #4CAF50;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.success-message p {
+    color: #a8e6a3;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
 }
 
 .download-button {
     display: inline-block;
-    background: #4CAF50;
+    background: linear-gradient(45deg, #4CAF50, #66bb6a);
     color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 25px;
+    padding: 1rem 2rem;
+    border-radius: 30px;
     text-decoration: none;
-    margin-top: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    text-transform: none;
 }
 
 .download-button:hover {
-    background: #45a049;
-    transform: translateY(-2px);
+    background: linear-gradient(45deg, #45a049, #5cb85c);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
+}
+
+@keyframes successFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
 }
 
 /* Footer */
@@ -504,10 +558,27 @@ footer {
         font-size: 0.9rem;
     }
 
-    /* Result container mobile */
+    /* Success message mobile */
+    .success-message {
+        padding: 1.5rem;
+        margin: 1.5rem auto;
+    }
+
+    .success-message h3 {
+        font-size: 1.5rem;
+    }
+
+    .success-message p {
+        font-size: 1rem;
+    }
+
+    .success-icon {
+        font-size: 2.5rem;
+    }
+
     .download-button {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.9rem;
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
     }
 }
 
@@ -586,6 +657,25 @@ footer {
 
     .feature-card h4 {
         font-size: 1.2rem;
+    }
+
+    /* Success message small mobile */
+    .success-message {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .success-message h3 {
+        font-size: 1.3rem;
+    }
+
+    .success-icon {
+        font-size: 2rem;
+    }
+
+    .download-button {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
     }
 }
 
