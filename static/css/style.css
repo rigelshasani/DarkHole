@@ -12,6 +12,9 @@ body {
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
 }
 
 /* Space Background */
@@ -193,6 +196,8 @@ h1 {
     padding: 2rem;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .upload-area {
@@ -244,6 +249,9 @@ h1 {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
+    border: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .upload-button:hover {
@@ -304,6 +312,8 @@ h1 {
     text-decoration: none;
     margin-top: 1rem;
     transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .download-button:hover {
@@ -385,6 +395,7 @@ footer {
     box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
 }
 
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -392,6 +403,16 @@ footer {
 
     h1 {
         font-size: 2.5rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    /* Adjust black hole and planets for mobile */
+    .black-hole-container {
+        height: 250px;
+        margin: 1.5rem 0;
     }
 
     .black-hole {
@@ -404,12 +425,167 @@ footer {
         height: 120px;
     }
 
+    /* Scale down planets for mobile */
+    .planet-1 {
+        width: 8px;
+        height: 8px;
+        transform-origin: -70px 0;
+    }
+
+    .planet-2 {
+        width: 10px;
+        height: 10px;
+        transform-origin: -90px 0;
+    }
+
+    .planet-3 {
+        width: 6px;
+        height: 6px;
+        transform-origin: -55px 0;
+    }
+
+    /* Upload area mobile optimization */
+    .upload-container {
+        padding: 1rem;
+    }
+
+    .upload-area {
+        min-height: 180px;
+        padding: 1.5rem 1rem;
+    }
+
+    .upload-content h2 {
+        font-size: 1.5rem;
+        margin: 1rem 0 0.5rem;
+    }
+
+    .upload-icon {
+        font-size: 2.5rem;
+    }
+
+    .upload-button {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Progress bar mobile */
+    .progress-container {
+        margin: 15px auto;
+    }
+
+    .progress-text {
+        font-size: 1rem;
+    }
+
+    /* Features section mobile */
+    .features-section {
+        margin: 3rem 0;
+    }
+
+    .features-section h3 {
+        font-size: 1.8rem;
+    }
+
     .features-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
     
     .feature-card {
         padding: 1.5rem;
+    }
+
+    .feature-card h4 {
+        font-size: 1.3rem;
+    }
+
+    .learn-more-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Result container mobile */
+    .download-button {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .container {
+        padding: 0.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .black-hole-container {
+        height: 200px;
+        margin: 1rem 0;
+    }
+
+    .black-hole {
+        width: 100px;
+        height: 100px;
+    }
+
+    .ouroboros {
+        width: 100px;
+        height: 100px;
+    }
+
+    /* Further scale down planets */
+    .planet-1 {
+        width: 6px;
+        height: 6px;
+        transform-origin: -60px 0;
+    }
+
+    .planet-2 {
+        width: 8px;
+        height: 8px;
+        transform-origin: -75px 0;
+    }
+
+    .planet-3 {
+        width: 5px;
+        height: 5px;
+        transform-origin: -45px 0;
+    }
+
+    .upload-area {
+        min-height: 160px;
+        padding: 1rem;
+    }
+
+    .upload-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .upload-icon {
+        font-size: 2rem;
+    }
+
+    .features-section h3 {
+        font-size: 1.5rem;
+    }
+
+    .feature-card {
+        padding: 1rem;
+    }
+
+    .feature-icon {
+        font-size: 2rem;
+    }
+
+    .feature-card h4 {
+        font-size: 1.2rem;
     }
 }
 

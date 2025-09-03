@@ -149,14 +149,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add parallax effect to stars
-    document.addEventListener('mousemove', function(e) {
-        const stars = document.querySelector('.stars');
-        const twinkling = document.querySelector('.twinkling');
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-        
-        stars.style.transform = `translate(${x * 50}px, ${y * 50}px)`;
-        twinkling.style.transform = `translate(${x * 30}px, ${y * 30}px)`;
-    });
+    // Add parallax effect to stars (disabled on mobile for performance)
+    if (window.innerWidth > 768) {
+        document.addEventListener('mousemove', function(e) {
+            const stars = document.querySelector('.stars');
+            const twinkling = document.querySelector('.twinkling');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            stars.style.transform = `translate(${x * 50}px, ${y * 50}px)`;
+            twinkling.style.transform = `translate(${x * 30}px, ${y * 30}px)`;
+        });
+    }
 }); 
