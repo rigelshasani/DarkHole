@@ -120,9 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultContainer.style.display = 'block';
                 
                 // Display extracted text in textarea
-                if (data.text) {
+                if (data.text && data.text_id) {
                     extractedTextArea.value = data.text;
-                    downloadLink.href = '/download';
+                    downloadLink.href = '/download/' + data.text_id;
                     downloadLink.style.display = 'inline-block';
                 } else {
                     console.error('No text in response:', data);

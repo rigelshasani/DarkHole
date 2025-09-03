@@ -9,6 +9,8 @@ from werkzeug.utils import secure_filename
 from pdf_extractor import extract_text_from_pdf
 import tempfile
 import traceback
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 # Configure logging to output to stdout
 logging.basicConfig(
@@ -26,6 +28,10 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-key-change-in-production')
+
+# In-memory storage for extracted text (with expiration)
+text_storage = {}
+TEXT_STORAGE_EXPIRY = 3600  # 1 hour
 
 # Configure Flask logging
 app.logger.setLevel(logging.INFO)
@@ -143,13 +149,19 @@ def upload_file():
             text = extract_text_from_pdf(filepath)
             app.logger.info('Text extraction successful')
 
-            # Store extracted text in session instead of file
-            session['extracted_text'] = text
-            app.logger.info('Extracted text stored in session')
+            # Store text temporarily with expiration (avoid session cookie size limit)
+            text_id = str(uuid.uuid4())
+            text_storage[text_id] = {
+                'text': text,
+                'created': datetime.now(),
+                'session_id': get_session_id()
+            }
+            app.logger.info('Text stored temporarily for download')
 
             return jsonify({
                 'message': 'File processed successfully',
                 'text': text,
+                'text_id': text_id,
                 'success': True
             })
         except Exception as e:
@@ -169,19 +181,32 @@ def upload_file():
         return jsonify({'error': sanitize_error(str(e))}), 500
 
 
-@app.route('/download')
-def download_file():
+@app.route('/download/<text_id>')
+def download_file(text_id):
     try:
-        app.logger.info('Download request received')
+        app.logger.info('Download request received for text_id: %s', text_id)
         
-        # Get extracted text from session
-        extracted_text = session.get('extracted_text')
+        # Clean expired entries
+        clean_expired_texts()
         
-        if not extracted_text:
-            app.logger.error('No text available for download in session')
+        # Get extracted text from temporary storage
+        text_data = text_storage.get(text_id)
+        
+        if not text_data:
+            app.logger.error('No text available for download with id: %s', text_id)
             return jsonify({'error': 'No text available for download'}), 404
             
+        # Verify session matches (basic security)
+        if text_data.get('session_id') != get_session_id():
+            app.logger.error('Session mismatch for download')
+            return jsonify({'error': 'Invalid download request'}), 403
+            
+        extracted_text = text_data['text']
         app.logger.info('Sending text file for download')
+        
+        # Clean up after download
+        del text_storage[text_id]
+        
         return send_file(
             io.BytesIO(extracted_text.encode('utf-8')),
             as_attachment=True,
@@ -193,6 +218,20 @@ def download_file():
         app.logger.error('Download failed: %s', str(e))
         app.logger.error('Traceback: %s', traceback.format_exc())
         return jsonify({'error': sanitize_error(str(e))}), 500
+
+
+def clean_expired_texts():
+    """Remove expired text entries from memory."""
+    current_time = datetime.now()
+    expired_keys = []
+    
+    for text_id, data in text_storage.items():
+        if current_time - data['created'] > timedelta(seconds=TEXT_STORAGE_EXPIRY):
+            expired_keys.append(text_id)
+    
+    for key in expired_keys:
+        del text_storage[key]
+        app.logger.info('Cleaned up expired text entry: %s', key)
 
 
 @app.errorhandler(404)
