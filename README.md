@@ -2,8 +2,6 @@
 
 A secure, high-performance PDF text extraction tool with a cosmic-inspired interface.
 
-![DarkHole Homepage](docs/screenshots/homepage.png)
-
 ---
 
 ## 🚀 **Try DarkHole Live**
@@ -13,6 +11,8 @@ A secure, high-performance PDF text extraction tool with a cosmic-inspired inter
 *Extract text from any PDF with cosmic precision - no installation required!*
 
 ---
+
+![DarkHole Homepage](docs/screenshots/homepage.png)
 
 ## Features
 
