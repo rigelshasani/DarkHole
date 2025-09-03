@@ -4,6 +4,16 @@ A secure, high-performance PDF text extraction tool with a cosmic-inspired inter
 
 ![DarkHole Homepage](docs/screenshots/homepage.png)
 
+---
+
+## 🚀 **Try DarkHole Live**
+
+### **[Visit darkhole.org →](https://darkhole.org)**
+
+*Extract text from any PDF with cosmic precision - no installation required!*
+
+---
+
 ## Features
 
 **DarkHole** extracts text from PDFs using multiple fallback methods to ensure maximum accuracy and reliability.
